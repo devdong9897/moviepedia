@@ -9,6 +9,7 @@ function App() {
   const [order, setOrder] = useState("createdAt");
   const [offset, setOffset] = useState(0);
   const [hasNext, setHasNext] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
@@ -23,7 +24,17 @@ function App() {
 
   // 2. 매개변수로 받아서 getReviews(api)함수로 전달해서 받아온 데이터안에서 정렬한다.
   const handleLoad = async (options) => {
-    const { reviews, paging } = await getReviews(options);
+    let result;
+    try {
+      setIsLoading(true);
+      result = await getReviews(options);
+    } catch (error) {
+      console.log(error);
+      return;
+    } finally {
+      setIsLoading(false);
+    }
+    const { paging, reviews } = result;
     if (options.offset === 0) {
       setItems(reviews);
     } else {
@@ -56,9 +67,11 @@ function App() {
         <button onClick={handleBestClick}>베스트순</button>
       </div>
       <ReviewList items={sortedItems} onDelete={handleDelete} />
-      <button disabled={!hasNext} onClick={handleLoadMore}>
-        더 보기
-      </button>
+      {hasNext && (
+        <button disabled={isLoading} onClick={handleLoadMore}>
+          더 보기
+        </button>
+      )}
     </div>
   );
 }
