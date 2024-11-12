@@ -7,6 +7,9 @@ const LIMIT = 6;
 function App() {
   const [items, setItems] = useState([]);
   const [order, setOrder] = useState("createdAt");
+  const [offset, setOffset] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
 
   const handleNewestClick = () => setOrder("createdAt");
@@ -20,8 +23,24 @@ function App() {
 
   // 2. 매개변수로 받아서 getReviews(api)함수로 전달해서 받아온 데이터안에서 정렬한다.
   const handleLoad = async (options) => {
-    const { reviews } = await getReviews(options);
-    setItems(reviews);
+    const { reviews, paging } = await getReviews(options);
+    if (options.offset === 0) {
+      setItems(reviews);
+    } else {
+      // 비동기로 state를 변경할때에는 잘못된 시점에 값을 사용하는 문제가 있다.
+      // 이럴땐 세터함수의 값이 아니라 콜백(prevItems)을 전달해서 해결하면 된다.
+      // 그래서 비동기 상황에서 state를 변경할때 이전 state값을 사용하려면 세터함수에서 콜백을 사용해서 이전 state를 사용한다.
+      setItems((prevItems) => [...prevItems, ...reviews]);
+    }
+    // 현재 위치(options.offset)에 방금 불러온 데이터 개수(reviews.length)를 더해서 다음 위치를 설정.
+    setOffset(options.offset + reviews.length);
+    // 더 이상 불러올 데이터가 없을때...
+    setHasNext(paging.hasNext);
+  };
+
+  // 다음 페이지를 불러올 함수
+  const handleLoadMore = () => {
+    handleLoad({ order, offset, limit: LIMIT });
   };
 
   // 1. 최신순,베스트순(order)를 handleLoad매개변수에 전달한다.
@@ -37,6 +56,9 @@ function App() {
         <button onClick={handleBestClick}>베스트순</button>
       </div>
       <ReviewList items={sortedItems} onDelete={handleDelete} />
+      <button disabled={!hasNext} onClick={handleLoadMore}>
+        더 보기
+      </button>
     </div>
   );
 }
