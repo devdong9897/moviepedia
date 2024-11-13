@@ -32,11 +32,11 @@ function FileInput({ name, value, onChange }) {
     setPreview(nextPreview);
 
     // 이 URL은 브라우저가 임시로 만든 주소라서 나중에 사용하지 않을 때 제거해 주는 것이 좋다.
-    // 브라우저에서 만든 임시 URL을 해제해 메모리를 절약한다. 
+    // 브라우저에서 만든 임시 URL을 해제해 메모리를 절약한다.
     // 계속해서 새로운 URL을 만들면 브라우저에 불필요한 URL이 쌓일 수 있는데, 이 함수가 그런 걸 방지해 준다.
     return () => {
       setPreview();
-      URL.revokeObjectURL();
+      URL.revokeObjectURL(nextPreview);
     };
   }, [value]);
 
