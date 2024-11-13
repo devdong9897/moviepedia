@@ -35,7 +35,7 @@ function ReviewListItem({ item, onDelete, onEdit }) {
   );
 }
 
-function ReviewList({ items, onDelete }) {
+function ReviewList({ items, onDelete, onUpdate, onUpdateSuccess }) {
   // 현재 수정중인 요소에 Id를 저장할 state
   // ReviewList 컴포넌트는 editingId 상태를 사용해 현재 수정 중인 리뷰의 ID를 추적한다.
   // 이 ID에 맞는 리뷰만 ReviewForm에서 수정할 수 있게 된다.
@@ -48,15 +48,24 @@ function ReviewList({ items, onDelete }) {
         // item.id (현재 리스트에서 반복문으로 돌고 있는 리뷰의 ID)가 editingId와 일치하면,
         // 그 리뷰를 수정할 수 있도록 ReviewForm 컴포넌트를 렌더링하겠다는 의미.
         if (item.id === editingId) {
-          const { imgUrl, title, rating, content } = item;
+          const { id, imgUrl, title, rating, content } = item;
           // initialValues는 ReviewForm 컴포넌트에 전달할 초기값 객체. ReviewForm에 전달해야되기 때문에 변수를 만들어 할당.
           const initialValues = { title, rating, content };
+
+          const handleSubmit = (formatDate) => onUpdate(id, formatDate);
+
+          const handleSubmitSuccess = (review) => {
+            onUpdateSuccess(review);
+            setEditingId(null);
+          };
           return (
             <li key={item.id}>
               <ReviewForm
                 initialValues={initialValues} // 수정할 초기 값
                 initialPreview={imgUrl} // 이미지 미리보기 URL
                 onCancel={handleCancel} // 수정 취소 시 호출되는 함수
+                onSubmit={handleSubmit}
+                onSubmitSuccess={handleSubmitSuccess}
               />
             </li>
           );

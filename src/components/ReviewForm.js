@@ -13,9 +13,10 @@ const INITIAL_VALUES = {
 
 function ReviewForm({
   initialValues = INITIAL_VALUES,
-  initialPreview,  // FileInput 컴포넌트로 다시 프롭전달.
+  initialPreview, // FileInput 컴포넌트로 다시 프롭전달.
   onSubmitSuccess,
   onCancel,
+  onSubmit,
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingError, setSubmittingError] = useState(null);
@@ -51,7 +52,7 @@ function ReviewForm({
     try {
       setSubmittingError(null);
       setIsSubmitting(true);
-      result = await createReview(formData);
+      result = await onSubmit(formData);
     } catch (error) {
       setSubmittingError(error);
       return;
@@ -59,8 +60,8 @@ function ReviewForm({
       setIsSubmitting(false);
     }
     const { review } = result;
-    onSubmitSuccess(review);
     setValues(INITIAL_VALUES);
+    onSubmitSuccess(review);
   };
 
   // 제어컴포넌트 : values.title이나 values.rating 같은 state 값이 화면에 표시되는 값과 항상 같도록해준다.
