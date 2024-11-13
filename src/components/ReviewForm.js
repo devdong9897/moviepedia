@@ -11,10 +11,15 @@ const INITIAL_VALUES = {
   imgFile: null,
 };
 
-function ReviewForm({ onSubmitSuccess }) {
+function ReviewForm({
+  initialValues = INITIAL_VALUES,
+  initialPreview,  // FileInput 컴포넌트로 다시 프롭전달.
+  onSubmitSuccess,
+  onCancel,
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingError, setSubmittingError] = useState(null);
-  const [values, setValues] = useState(INITIAL_VALUES);
+  const [values, setValues] = useState(initialValues); // // initialValues를 state로 설정
 
   const handleChange = (name, value) => {
     // 여기서 prevValue를 사용하면 title, rating, content, imgFile중 변경된 필드만 갱신되고 나머지는 유지되게 한다.
@@ -70,6 +75,7 @@ function ReviewForm({ onSubmitSuccess }) {
       <FileInput
         name="imgFile"
         value={values.imgFile}
+        initialPreview={initialPreview}
         onChange={handleChange}
       />
       <input name="title" value={values.title} onChange={handleInputChange} />
@@ -82,6 +88,7 @@ function ReviewForm({ onSubmitSuccess }) {
       <button type="submit" disabled={isSubmitting}>
         확인
       </button>
+      {onCancel && <button onClick={onCancel}>취소</button>}
       {submittingError?.message && <span>{setIsSubmitting.message}</span>}
     </form>
   );

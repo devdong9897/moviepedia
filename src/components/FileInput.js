@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 // ReviewForm컴포넌트에서 props로 받음.
-function FileInput({ name, value, onChange }) {
-  const [preview, setPreview] = useState();
+function FileInput({ name, value, initialPreview, onChange }) {
+  const [preview, setPreview] = useState(initialPreview);
 
   const inputRef = useRef();
 
@@ -35,10 +35,10 @@ function FileInput({ name, value, onChange }) {
     // 브라우저에서 만든 임시 URL을 해제해 메모리를 절약한다.
     // 계속해서 새로운 URL을 만들면 브라우저에 불필요한 URL이 쌓일 수 있는데, 이 함수가 그런 걸 방지해 준다.
     return () => {
-      setPreview();
+      setPreview(initialPreview);
       URL.revokeObjectURL(nextPreview);
     };
-  }, [value]);
+  }, [value, initialPreview]);
 
   return (
     <div>
